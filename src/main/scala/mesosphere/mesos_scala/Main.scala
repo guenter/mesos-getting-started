@@ -2,6 +2,8 @@ package mesosphere.mesos_scala
 
 import org.apache.mesos.MesosSchedulerDriver
 import org.apache.mesos.Protos._
+import org.apache.mesos.state.ZooKeeperState
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Tobi Knaup
@@ -29,8 +31,10 @@ object Main extends App {
     .setFailoverTimeout(60.0) // Allow a 60 second window for failover
     .build
 
+  // Create a state object backed by ZK
+  val state = new ZooKeeperState("localhost:2181", 10, TimeUnit.SECONDS, "/getting-started-state")
   // Create the scheduler, the driver, and run it
-  val scheduler = new ExampleScheduler(command, numInstances)
+  val scheduler = new ExampleScheduler(command, numInstances, state)
   val driver = new MesosSchedulerDriver(scheduler, frameworkInfo, master)
   driver.run()
 }

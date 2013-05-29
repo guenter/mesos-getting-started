@@ -4,6 +4,7 @@ import org.apache.mesos.{SchedulerDriver, Scheduler}
 import org.apache.mesos.Protos._
 import java.util
 import java.util.logging.Logger
+import org.apache.mesos.state.State
 
 /**
  * A Mesos framework scheduler that runs a given number of instances of a command across a cluster.
@@ -11,11 +12,12 @@ import java.util.logging.Logger
  * @author Tobi Knaup
  */
 
-class ExampleScheduler(command: String, numInstances: Int) extends Scheduler {
+class ExampleScheduler(command: String, numInstances: Int, state: State) extends Scheduler {
 
   val log = Logger.getLogger(getClass.getName)
+  val currentInstancesStateName = "currentInstances"
   // Keep track of how many instances are currently running
-  var currentInstances = 0
+  var currentInstances = fetchCurrentInstances()
 
   def registered(driver: SchedulerDriver, p2: FrameworkID, p3: MasterInfo) {}
 
@@ -50,6 +52,7 @@ class ExampleScheduler(command: String, numInstances: Int) extends Scheduler {
         log.info("Launching task " + taskId.getValue)
         driver.launchTasks(offer.getId, List(task))
         currentInstances += 1
+        storeCurrentInstances()
       } else {
         log.info("Declining offer")
         driver.declineOffer(offer.getId)
@@ -64,6 +67,7 @@ class ExampleScheduler(command: String, numInstances: Int) extends Scheduler {
 
     if (status.getState.eq(TaskState.TASK_FAILED)) {
       currentInstances -= 1
+      storeCurrentInstances()
     }
   }
 
@@ -76,4 +80,29 @@ class ExampleScheduler(command: String, numInstances: Int) extends Scheduler {
   def executorLost(driver: SchedulerDriver, executor: ExecutorID, slave: SlaveID, p4: Int) {}
 
   def error(driver: SchedulerDriver, error: String) {}
+
+  private def fetchCurrentInstances(): Int = {
+    val bytes = state.fetch(currentInstancesStateName).get.value
+
+    val count = if (bytes.length > 0) {
+      bytes(0).toInt
+    } else {
+      0
+    }
+
+    log.info("Fetched current instance count " + count)
+    count
+  }
+
+  private def storeCurrentInstances(): Unit = {
+    val oldVar = state.fetch(currentInstancesStateName).get
+    val data = Array(currentInstances.toByte)
+    val newVar = state.store(oldVar.mutate(data))
+
+    if (data.sameElements(newVar.get.value)) {
+      log.info("Successfully stored current instance count " + currentInstances)
+    } else {
+      log.warning("Failed to store current instance count")
+    }
+  }
 }
