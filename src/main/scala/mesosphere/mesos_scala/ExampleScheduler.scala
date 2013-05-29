@@ -21,7 +21,41 @@ class ExampleScheduler(command: String, numInstances: Int) extends Scheduler {
 
   def reregistered(driver: SchedulerDriver, p2: MasterInfo) {}
 
-  def resourceOffers(driver: SchedulerDriver, offers: util.List[Offer]) {}
+  def resourceOffers(driver: SchedulerDriver, offers: util.List[Offer]) {
+    import scala.collection.JavaConversions._
+
+    for (offer <- offers) {
+      log.info("Received offer " + offer)
+
+      if (currentInstances < numInstances) {
+        val taskId = TaskID.newBuilder
+          .setValue("task_" + System.currentTimeMillis())
+
+        val cpuResource = Resource.newBuilder
+          .setName("cpus")
+          .setType(Value.Type.SCALAR)
+          .setScalar(Value.Scalar.newBuilder().setValue(1))
+
+        val commandInfo = CommandInfo.newBuilder
+          .setValue(command)
+
+        val task = TaskInfo.newBuilder
+          .setName(taskId.getValue)
+          .setTaskId(taskId)
+          .setSlaveId(offer.getSlaveId)
+          .addResources(cpuResource)
+          .setCommand(commandInfo)
+          .build
+
+        log.info("Launching task " + taskId.getValue)
+        driver.launchTasks(offer.getId, List(task))
+        currentInstances += 1
+      } else {
+        log.info("Declining offer")
+        driver.declineOffer(offer.getId)
+      }
+    }
+  }
 
   def offerRescinded(driver: SchedulerDriver, p2: OfferID) {}
 
