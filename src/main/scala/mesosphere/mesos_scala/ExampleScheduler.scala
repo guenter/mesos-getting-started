@@ -59,7 +59,13 @@ class ExampleScheduler(command: String, numInstances: Int) extends Scheduler {
 
   def offerRescinded(driver: SchedulerDriver, p2: OfferID) {}
 
-  def statusUpdate(driver: SchedulerDriver, status: TaskStatus) {}
+  def statusUpdate(driver: SchedulerDriver, status: TaskStatus) {
+    log.info("Received status update " + status)
+
+    if (status.getState.eq(TaskState.TASK_FAILED)) {
+      currentInstances -= 1
+    }
+  }
 
   def frameworkMessage(driver: SchedulerDriver, executor: ExecutorID, slave: SlaveID, p4: Array[Byte]) {}
 
