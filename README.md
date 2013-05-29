@@ -1,6 +1,6 @@
 # Mesos Getting Started Tutorial
 
-This tutorial shows how to build a simple distributed fault-tolerant framework on top of Mesos.
+This tutorial explains how to build a simple distributed fault-tolerant framework on top of Mesos.
 The example framework can launch a given number of instances of a command across a cluster,
 and will restart the command if it fails.
 
@@ -25,7 +25,7 @@ The Mesos repo on Github is currently out of sync. You can use the one below for
     make
     make install
 
-## Run Zookeeper and Mesos
+### Run Zookeeper and Mesos
 
 Mesos ships with Zookeeper. Run these commands in different terminal windows to start a local Zookeeper, Mesos master, and Mesos slave.
 
@@ -37,6 +37,6 @@ Mesos ships with Zookeeper. Run these commands in different terminal windows to 
 
     /usr/local/sbin/mesos-slave --master=zk://localhost:2181/mesos
 
-## Add the Mesos JAR to your local Maven Repo
+### Add the Mesos JAR to your local Maven Repo
 
     mvn install:install-file -Dfile=/path/to/incubator-mesos/build/src/mesos-0.13.0.jar -DgroupId=org.apache.mesos -DartifactId=mesos -Dversion=0.13.0 -Dpackaging=jar
