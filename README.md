@@ -6,11 +6,11 @@ and will restart the command if it fails.
 
 ## Prerequisites
 
-### Install Autotools
+### Install Autotools and Libtool
 
 Mesos uses autotools to build. Install via Homebrew on a Mac:
 
-    brew install autoconf automake
+    brew install autoconf automake libtool
 
 ### Install Mesos
 
