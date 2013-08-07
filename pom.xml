@@ -10,7 +10,8 @@
 
   <properties>
     <scala.version>2.10.1</scala.version>
-    <mesos.version>0.13.0</mesos.version>
+    <mesos.version>0.14.0</mesos.version>
+    <protobuf.version>2.4.1</protobuf.version>
   </properties>
 
   <dependencies>
@@ -30,10 +31,18 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>2.4.1</version>
+      <version>${protobuf.version}</version>
     </dependency>
 
   </dependencies>
+
+  <repositories>
+    <repository>
+      <id>mesosphere-public-repo</id>
+      <name>Mesosphere Public Repo</name>
+      <url>http://s3.amazonaws.com/mesosphere-maven-public/</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>
