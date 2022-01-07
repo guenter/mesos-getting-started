@@ -11,7 +11,7 @@
   <properties>
     <scala.version>2.10.1</scala.version>
     <mesos.version>0.14.0</mesos.version>
-    <protobuf.version>2.4.1</protobuf.version>
+    <protobuf.version>3.16.1</protobuf.version>
   </properties>
 
   <dependencies>
